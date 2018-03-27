@@ -12,90 +12,70 @@ class AjaxPost extends CI_Controller {
 
 	}
 	function get_data_C(){
-		$this->load->model('PostModel');
-		$resultado = $this->PostModel->get_data();
-		if ($resultado)
-		{
-				$resultado_ = array('status'=>'OK', 'data' =>  $resultado);
-				echo json_encode($resultado_);
-		}
-		else
-		{
-				echo json_encode(array('status'=>'SIN_DATOS','mensaje'=>'No se encontraron datos...'));
-		}
+		$query = $this->db->get('post');
+		if ($query->num_rows() > 0) {
+        echo json_encode(array('status'=>'OK','data'=>$query->result()));
+    }else{
+        echo json_encode(array('status'=>'Error','message'=>'Data Error'));
+    }
 	}
-	function getPostC($post_id){
 
-		$this->load->model('PostModel');
-		$resultado = $this->PostModel->getPostM($post_id);
-		if ($resultado)
-		{
-				$resultado_ = array('status'=>'OK', 'data' =>  (object)$resultado);
-				$obj = (object)$resultado_; //change array to stdClass object
-				echo json_encode($obj);
-		}
-		else
-		{
-				echo json_encode(array('status'=>'SIN_DATOS','mensaje'=>'No se encontraron datos...'));
-		}
+	function getPostC($post_id){
+		$this->db->where('id', $post_id);
+		$query = $this->db->get('post');
+		if ($query->num_rows() > 0) {
+        echo json_encode(array('status'=>'OK', 'data' => $query->result()));
+    }else{
+        echo json_encode(array('status'=>'Error', 'message' =>'Data Error'));
+    }
 	}
 
 	function insertPostC(){
-	$idUser = 1;
-	$title = $this->input->post('title');
-	$body	= $this->input->post('body');
+		$idUser = 1;
+		$title = $this->input->post('title');
+		$body	= $this->input->post('body');
 
-	$this->load->model('PostModel');
-	$insert_post = $this->PostModel->insertPostM($idUser,$title,$body);
-		if ($insert_post)
+		$this->db->set('iduser', $idUser);
+		$this->db->set('title', $title);
+		$this->db->set('body', $body);
+		$this->db->insert('post');
+		if ($this->db->affected_rows())
 		{
-				// $resultado_ = array('status'=>'OK', 'data' =>  (object)$resultado);
-				// $obj = (object)$resultado_; //change array to stdClass object
-				// echo json_encode($obj);
+			echo json_encode(array('status'=>'OK'));
+		}else{
+		 echo json_encode(array('status'=>'Error', 'message' =>  'Data Error'));
 		}
-		else
-		{
-				echo json_encode(array('status'=>'ERROR','mensaje'=>'Error al insertar post...'));
-		}
+
 	}
 
 	function deletePostC(){
-	$idPost = $this->input->post('idPost');;
+		$idPost = $this->input->post('idPost');
 
-	$this->load->model('PostModel');
-	$deletePost = $this->PostModel->deletePostM($idPost);
-		if ($deletePost)
+		$this->db->where('id', $idPost);
+		$this->db->delete('post');
+		if ($this->db->affected_rows())
 		{
-				// $resultado_ = array('status'=>'OK');
-				// // $obj = (object)$resultado_; //change array to stdClass object
-				// echo json_encode($resultado_);
-				$this->get_data_C();
-		}
-		else
-		{
-				echo json_encode(array('status'=>'ERROR','mensaje'=>'Error al insertar post...'));
+			$this->get_data_C();
+		}else{
+		 $data = array('status'=>'Error', 'message' =>  'Data Error');
 		}
 	}
 
 	function editPostC(){
-	$title = $this->input->post('title');
-	$body	= $this->input->post('body');
-	$idPost	= $this->input->post('idPost');
+		$title = $this->input->post('title');
+		$body	= $this->input->post('body');
+		$idPost	= $this->input->post('idPost');
 
+		$this->db->set('title', $title);
+		$this->db->set('body', $body);
+		$this->db->where('id', $idPost);
+		$this->db->update('post');
 
-
-	$this->load->model('PostModel');
-	$editPost = $this->PostModel->editPostM($title,$body,$idPost);
-		if ($editPost)
+		if ($this->db->affected_rows())
 		{
 			echo json_encode(array('status'=>'OK'));
-				// $resultado_ = array('status'=>'OK', 'data' =>  (object)$resultado);
-				// $obj = (object)$resultado_; //change array to stdClass object
-				// echo json_encode($obj);
-		}
-		else
-		{
-				echo json_encode(array('status'=>'ERROR','mensaje'=>'Error al editar post...'));
+		}else{
+		 	echo json_encode(array('status'=>'ERROR','mensaje'=>'Error al editar post...'));
 		}
 	}
 

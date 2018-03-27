@@ -111,7 +111,7 @@ angular.module("FinalApp")
   });
   //get() => a diferencia de query() este no espera un array sino que solo un objeto JSON
 })
-.controller("NewPostController",function($scope,$http){
+.controller("NewPostController",function($scope,$http,$location){
 
   $scope.post = {};
   $scope.title = "Crear post";
@@ -125,16 +125,13 @@ angular.module("FinalApp")
         data : "title="+$scope.post.title+"&body="+$scope.post.body,
         headers: {'Content-Type': 'application/x-www-form-urlencoded'}
     }).then(function mySuccess(response) {
-      // $scope.posts=response.data.data[0];
-      // console.log(response.data.data);
-      console.log(response);
+      if (response.data.status=="OK") {
+        $location.path("/");
+      }
 
     }, function myError(err) {
     });
-    // PostResource.save({data:$scope.post},function(data){
-    //   console.log(data);
-    //   $location.path("/");
-    // });
+
   }
 
 })

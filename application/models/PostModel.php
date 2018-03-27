@@ -56,9 +56,9 @@ class PostModel extends CI_Model {
 
 
 
-  public function deletePostM($post_id){
+  public function deletePostM($idPost){
 
-      $query = $this->db->query("DELETE FROM postapp.post WHERE id=?", array($post_id));
+      $query = $this->db->query("DELETE FROM postapp.post WHERE id=?", array($idPost));
 
         if ($this->db->affected_rows())
         {
